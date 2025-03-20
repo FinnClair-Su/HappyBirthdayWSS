@@ -1,0 +1,29 @@
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.beab6b6c98d1bfe8f4af8534304f5491885b3c97376d828ae9c9fdb20e1f67d006-60158240-5915-4277-9ebc-7ced5f0f8b42000030406ce94d00 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          app_location: "/" # 应用代码位置
+          output_location: "" # 没有构建过程，所以为空
+          skip_app_build: true # 跳过构建步骤

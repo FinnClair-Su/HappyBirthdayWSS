@@ -1,3 +1,4 @@
+# 修改 .github/workflows/azure-static-web-apps.yml
 name: Azure Static Web Apps CI/CD
 
 on:
@@ -22,8 +23,8 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.beab6b6c98d1bfe8f4af8534304f5491885b3c97376d828ae9c9fdb20e1f67d006-60158240-5915-4277-9ebc-7ced5f0f8b42000030406ce94d00 }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          app_location: "/" # 应用代码位置
-          output_location: "" # 没有构建过程，所以为空
-          skip_app_build: true # 跳过构建步骤
+          app_location: "/" 
+          output_location: ""
+          skip_app_build: true

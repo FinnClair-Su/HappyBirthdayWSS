@@ -17,10 +17,16 @@
         <button id="continue-button" class="continue-button">继续探索</button>
     </div>
     
-    <!-- 时间线部分 -->
-    <div id="timeline-container" class="timeline-container">
-        <div id="year-display" class="year-display">2006</div>
-        <div id="year-decoration" class="decoration"></div>
+    <!-- 特殊记忆展示 -->
+    <div id="memories-container" class="memories-container">
+        <div class="memory-title">珍贵时刻</div>
+        <div id="memory-items" class="memory-items"></div>
+    </div>
+    
+    <!-- 祝福墙 -->
+    <div id="wishes-wall" class="wishes-wall">
+        <div class="wishes-title">祝福墙</div>
+        <div id="wishes-container" class="wishes-container"></div>
     </div>
     
     <!-- 照片墙 -->
@@ -33,6 +39,17 @@
         <!-- 词汇项目将由JS动态生成 -->
     </div>
     
+    <!-- 互动生日蛋糕 -->
+    <div id="birthday-cake" class="birthday-cake-container">
+        <div class="cake-wrapper">
+            <div class="cake-base"></div>
+            <div class="cake-middle"></div>
+            <div class="cake-top"></div>
+            <div id="candles-container" class="candles-container"></div>
+        </div>
+        <div class="cake-message">点击蜡烛吹灭它们，许下生日愿望</div>
+    </div>
+    
     <!-- 照片查看器 -->
     <div id="photo-viewer" class="photo-viewer">
         <img id="fullscreen-image" src="">
@@ -40,9 +57,19 @@
     </div>
     
     <!-- 控制按钮 -->
-    <div id="timeline-controls" class="controls" style="display: none;">
+    <div id="navigation-controls" class="controls">
         <button id="prev-button" class="control-button">上一个</button>
         <button id="next-button" class="control-button">下一个</button>
+    </div>
+    
+    <!-- 音乐控制 -->
+    <div id="music-control" class="music-control">
+        <button id="music-toggle" class="music-button">
+            <span class="music-icon">♪</span>
+        </button>
+        <audio id="bg-music" loop>
+            <source src="" type="audio/mp3">
+        </audio>
     </div>
     
     <script src="scripts/main.js"></script>

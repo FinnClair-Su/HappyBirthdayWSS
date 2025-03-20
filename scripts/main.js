@@ -3,6 +3,7 @@
 // 状态变量
 let welcomePhase = 'opening';
 let visibleLines = 0;
+let currentSection = 'welcome'; // welcome, memories, wishes, photos, wordcloud, cake
 
 // 开场白文字
 const openingLines = [
@@ -62,6 +63,22 @@ const textContainer = document.getElementById('text-container');
 const starContainer = document.getElementById('star-container');
 const noteContainer = document.getElementById('note-container');
 const continueButton = document.getElementById('continue-button');
+const navigationControls = document.getElementById('navigation-controls');
+const prevButton = document.getElementById('prev-button');
+const nextButton = document.getElementById('next-button');
+
+// 导航容器
+const memoriesContainer = document.getElementById('memories-container');
+const wishesWall = document.getElementById('wishes-wall');
+const photoWall = document.getElementById('photo-wall');
+const wordCloud = document.getElementById('word-cloud');
+const birthdayCake = document.getElementById('birthday-cake');
+const photoViewer = document.getElementById('photo-viewer');
+const fullscreenImage = document.getElementById('fullscreen-image');
+
+// 音乐控制
+const musicToggle = document.getElementById('music-toggle');
+const bgMusic = document.getElementById('bg-music');
 
 // 初始化欢迎动画
 function initializeWelcome() {
@@ -82,6 +99,20 @@ function initializeWelcome() {
     continueButton.addEventListener('click', function() {
         handleContinueButtonClick();
     });
+    
+    // 设置导航按钮事件
+    prevButton.addEventListener('click', navigateToPrevSection);
+    nextButton.addEventListener('click', navigateToNextSection);
+    
+    // 设置音乐控制
+    musicToggle.addEventListener('click', toggleMusic);
+    
+    // 初始化各个部分
+    initializeMemories();
+    initializeWishesWall();
+    generatePhotoWall();
+    generateWordCloud();
+    initializeBirthdayCake();
 }
 
 // 创建星星
@@ -310,43 +341,49 @@ function showASCIIBirthdayArt() {
         setTimeout(() => {
             showContinueButton('开始时光之旅');
             continueButton.onclick = function() {
-                startTimelineJourney();
+                startJourney();
             };
         }, 2000);
     }, 500);
 }
 
-// 开始时光之旅
-function startTimelineJourney() {
+// 开始旅程
+function startJourney() {
     // 隐藏欢迎部分
     welcomeContainer.style.opacity = '0';
     welcomeContainer.style.pointerEvents = 'none';
     
-    // 显示时间线控制
-    document.getElementById('timeline-controls').style.display = 'block';
+    // 显示导航控制
+    navigationControls.classList.add('visible');
     
-    // 初始化并显示时间线
-    initializeTimeline();
+    // 导航到第一个部分
+    navigateToSection('memories');
 }
 
-// ==== 时间线部分 ====
+// ---- 新添加的部分 ----
 
-// 状态变量
-let timelinePhase = 'timeline'; // timeline, photos, wordcloud
-let currentYear = 2006;
-let timeoutId = null;
-let isTransitioning = false;
+// 特殊记忆数据
+const memoryData = [
+    { year: 2006, image: '/api/placeholder/300/200', description: '在2006年的春天，你降临到这个世界，给家人带来了无比的喜悦。' },
+    { year: 2011, image: '/api/placeholder/300/200', description: '小学时期的你充满好奇，对世界充满了探索的欲望。' },
+    { year: 2014, image: '/api/placeholder/300/200', description: '初中生活开始，你开始展现出自己的才华和独特个性。' },
+    { year: 2018, image: '/api/placeholder/300/200', description: '高中岁月，学习与友谊并重，你逐渐成长为一个有责任感的少年。' },
+    { year: 2023, image: '/api/placeholder/300/200', description: '大学录取通知书到来，你迎来人生的新篇章。' },
+    { year: 2024, image: '/api/placeholder/300/200', description: '18岁成人礼，你正式迈入成年的门槛，未来充满了可能性。' },
+    { year: 2025, image: '/api/placeholder/300/200', description: '19岁生日，愿你在大学的旅途中收获知识、友谊与成长。' }
+];
 
-// DOM元素
-const timelineContainer = document.getElementById('timeline-container');
-const yearDisplay = document.getElementById('year-display');
-const yearDecoration = document.getElementById('year-decoration');
-const photoWall = document.getElementById('photo-wall');
-const wordCloud = document.getElementById('word-cloud');
-const prevButton = document.getElementById('prev-button');
-const nextButton = document.getElementById('next-button');
-const photoViewer = document.getElementById('photo-viewer');
-const fullscreenImage = document.getElementById('fullscreen-image');
+// 祝福墙数据
+const wishesData = [
+    { name: '爸爸', avatar: '/api/placeholder/40/40', content: '19岁生日快乐！希望你能像莫扎特一样，在自己热爱的领域发光发热，成为最好的自己。', date: '2025-03-28' },
+    { name: '妈妈', avatar: '/api/placeholder/40/40', content: '宝贝生日快乐！从你出生那天起，你就是我们家的小太阳。希望你永远保持那份阳光和热情，健康成长！', date: '2025-03-28' },
+    { name: '奶奶', avatar: '/api/placeholder/40/40', content: '祝我的乖孙女生日快乐！奶奶虽然不懂你们年轻人的世界，但奶奶的爱和祝福永远陪伴着你。', date: '2025-03-28' },
+    { name: '张老师', avatar: '/api/placeholder/40/40', content: '生日快乐！作为你的老师，很高兴看到你在大学里的成长。希望你能继续保持对知识的渴望，勇敢追求自己的梦想！', date: '2025-03-28' },
+    { name: '李同学', avatar: '/api/placeholder/40/40', content: '生日快乐，我的好朋友！感谢你一直以来的陪伴与支持。大学生活因为有你而更加精彩！', date: '2025-03-28' },
+    { name: '王同学', avatar: '/api/placeholder/40/40', content: '祝你生日快乐！愿你的19岁充满欢笑和美好，在学业和生活中都能找到平衡，成为最棒的自己！', date: '2025-03-28' },
+    { name: '赵阿姨', avatar: '/api/placeholder/40/40', content: '生日快乐！还记得你小时候总爱来我家玩，转眼间你已经长大成人了。希望你的未来一片光明！', date: '2025-03-28' },
+    { name: '孙叔叔', avatar: '/api/placeholder/40/40', content: '19岁生日快乐！大学是人生中最美好的时光之一，希望你能珍惜这段时光，收获知识与友谊。', date: '2025-03-28' }
+];
 
 // 照片数据
 const photoData = [
@@ -383,62 +420,80 @@ const wordCloudData = [
     { text: '生日快乐', size: 58, x: 75, y: 45 }
 ];
 
-// 年份对应的设计风格
-const yearStyles = {
-    2006: 'style-2006',
-    2007: 'style-2006',
-    2008: 'style-2008',
-    2009: 'style-2008',
-    2010: 'style-2008',
-    2011: 'style-2011',
-    2012: 'style-2011',
-    2013: 'style-2011',
-    2014: 'style-2014',
-    2015: 'style-2014',
-    2016: 'style-2014',
-    2017: 'style-2017',
-    2018: 'style-2017',
-    2019: 'style-2017',
-    2020: 'style-2020',
-    2021: 'style-2020',
-    2022: 'style-2022',
-    2023: 'style-2022',
-    2024: 'style-2024',
-    2025: 'style-2024'
-};
+// 初始化特殊记忆展示
+function initializeMemories() {
+    const memoryItemsContainer = document.getElementById('memory-items');
+    memoryItemsContainer.innerHTML = '';
+    
+    memoryData.forEach((memory, index) => {
+        const memoryItem = document.createElement('div');
+        memoryItem.className = 'memory-item';
+        memoryItem.dataset.index = index;
+        
+        memoryItem.innerHTML = `
+            <div class="memory-image" style="background-image: url(${memory.image})"></div>
+            <div class="memory-details">
+                <div class="memory-year">${memory.year}</div>
+                <div class="memory-description">${memory.description}</div>
+            </div>
+        `;
+        
+        memoryItemsContainer.appendChild(memoryItem);
+    });
+    
+    // 显示第一个记忆
+    showMemoryAtIndex(0);
+}
 
-// 年份特殊装饰/文字
-const yearDecorations = {
-    2006: '莫扎特250周年，你的生命开始了',
-    2008: 'iPhone时代开始',
-    2011: '你5岁了，童年记忆',
-    2013: '你7岁了，小学正当时',
-    2016: '你10岁了，懂事的年纪',
-    2020: '14岁的你，经历了疫情',
-    2022: '16岁，青春洋溢',
-    2024: '18岁，成年啦！',
-    2025: '19岁，愈发美丽'
-};
+// 显示指定索引的记忆
+let currentMemoryIndex = 0;
+function showMemoryAtIndex(index) {
+    const memoryItems = document.querySelectorAll('.memory-item');
+    memoryItems.forEach((item, i) => {
+        item.classList.remove('active', 'prev', 'next');
+        if (i === index) {
+            item.classList.add('active');
+        } else if (i === index - 1 || (index === 0 && i === memoryItems.length - 1)) {
+            item.classList.add('prev');
+        } else if (i === index + 1 || (index === memoryItems.length - 1 && i === 0)) {
+            item.classList.add('next');
+        }
+    });
+    currentMemoryIndex = index;
+    
+    // 更新导航按钮文本
+    updateNavigationButtons();
+}
 
-// 初始化时间线
-function initializeTimeline() {
-    // 显示时间线容器
-    timelineContainer.classList.add('visible');
-    setTimeout(() => {
-        yearDisplay.classList.add('visible');
-        updateYearStyle();
-        startYearSequence();
-    }, 500);
+// 初始化祝福墙
+function initializeWishesWall() {
+    const wishesContainer = document.getElementById('wishes-container');
+    wishesContainer.innerHTML = '';
     
-    // 生成照片墙
-    generatePhotoWall();
-    
-    // 生成词云
-    generateWordCloud();
-    
-    // 添加按钮事件监听
-    prevButton.addEventListener('click', handlePrevButton);
-    nextButton.addEventListener('click', handleNextButton);
+    wishesData.forEach((wish, index) => {
+        const wishCard = document.createElement('div');
+        wishCard.className = 'wish-card';
+        wishCard.style.setProperty('--rotation', `${(Math.random() * 10 - 5)}deg`);
+        wishCard.style.animationDelay = `${index * 0.1}s`;
+        
+        // 随机背景颜色
+        const hue = Math.floor(Math.random() * 40) + 340; // 红粉色系
+        const saturation = Math.floor(Math.random() * 30) + 70; // 比较饱和
+        const lightness = Math.floor(Math.random() * 10) + 90; // 很亮
+        wishCard.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        
+        wishCard.innerHTML = `
+            <div class="wish-header">
+                <div class="wish-avatar" style="background-image: url(${wish.avatar})"></div>
+                <div class="wish-name">${wish.name}</div>
+            </div>
+            <div class="wish-content">${wish.content}</div>
+            <div class="wish-date">${wish.date}</div>
+            <div class="wish-decoration">♥</div>
+        `;
+        
+        wishesContainer.appendChild(wishCard);
+    });
 }
 
 // 生成照片墙
@@ -496,178 +551,83 @@ function generateWordCloud() {
     });
 }
 
-// 更新年份显示的样式
-function updateYearStyle() {
-    // 移除所有风格类
-    Object.values(yearStyles).forEach(style => {
-        timelineContainer.classList.remove(style);
-    });
+// 初始化生日蛋糕
+function initializeBirthdayCake() {
+    const candlesContainer = document.getElementById('candles-container');
+    candlesContainer.innerHTML = '';
     
-    // 添加当前年份的风格类
-    timelineContainer.classList.add(yearStyles[currentYear]);
-    
-    // 更新年份显示
-    yearDisplay.textContent = currentYear;
-    
-    // 更新装饰文字
-    yearDecoration.textContent = yearDecorations[currentYear] || '';
-}
-
-// 开始年份序列
-function startYearSequence() {
-    const delay = getYearTransitionDelay();
-    
-    timeoutId = setTimeout(() => {
-        if (currentYear < 2023) {
-            transitionToNextYear();
-        } else {
-            // 2023及之后转到照片墙
-            transitionToPhase('photos');
-        }
-    }, delay);
-}
-
-// 根据年份获取过渡延迟时间
-function getYearTransitionDelay() {
-    if (currentYear === 2006) return 3000; // 第一年停留久一点
-    if (currentYear >= 2020) return 2000; // 近期年份停留久一点
-    return 1000; // 中间年份快速切换
-}
-
-// 过渡到下一年
-function transitionToNextYear() {
-    if (isTransitioning) return;
-    isTransitioning = true;
-    
-    // 淡出当前年份
-    yearDisplay.classList.remove('visible');
-    yearDisplay.classList.add('exit');
-    
-    setTimeout(() => {
-        // 更新年份
-        currentYear++;
-        
-        // 更新样式
-        updateYearStyle();
-        
-        // 重置并淡入新年份
-        yearDisplay.classList.remove('exit');
-        void yearDisplay.offsetWidth; // 触发重排
-        yearDisplay.classList.add('visible');
-        
-        isTransitioning = false;
-        
-        // 继续序列
-        startYearSequence();
-    }, 500);
-}
-
-// 过渡到前一年
-function transitionToPrevYear() {
-    if (isTransitioning || currentYear <= 2006) return;
-    isTransitioning = true;
-    
-    clearTimeout(timeoutId);
-    
-    // 淡出当前年份
-    yearDisplay.classList.remove('visible');
-    yearDisplay.classList.add('exit');
-    
-    setTimeout(() => {
-        // 更新年份
-        currentYear--;
-        
-        // 更新样式
-        updateYearStyle();
-        
-        // 重置并淡入新年份
-        yearDisplay.classList.remove('exit');
-        void yearDisplay.offsetWidth; // 触发重排
-        yearDisplay.classList.add('visible');
-        
-        isTransitioning = false;
-        
-        // 继续序列
-        startYearSequence();
-    }, 500);
-}
-
-// 过渡到特定阶段
-function transitionToPhase(phase) {
-    if (phase === timelinePhase) return;
-    
-    clearTimeout(timeoutId);
-    
-    // 隐藏当前阶段
-    if (timelinePhase === 'timeline') {
-        timelineContainer.classList.remove('visible');
-    } else if (timelinePhase === 'photos') {
-        photoWall.classList.remove('visible');
-    } else if (timelinePhase === 'wordcloud') {
-        wordCloud.classList.remove('visible');
-    }
-    
-    setTimeout(() => {
-        // 显示新阶段
-        if (phase === 'timeline') {
-            timelineContainer.classList.add('visible');
-            yearDisplay.classList.add('visible');
-            updateYearStyle();
-            startYearSequence();
-        } else if (phase === 'photos') {
-            photoWall.classList.add('visible');
-        } else if (phase === 'wordcloud') {
-            wordCloud.classList.add('visible');
-        }
-        
-        // 更新当前阶段
-        timelinePhase = phase;
-        
-        // 更新按钮文字
-        updateButtonText();
-    }, 1000);
-}
-
-// 更新按钮文字
-function updateButtonText() {
-    if (timelinePhase === 'timeline') {
-        prevButton.textContent = '上一年';
-        nextButton.textContent = '下一年';
-    } else if (timelinePhase === 'photos') {
-        prevButton.textContent = '返回时间线';
-        nextButton.textContent = '查看祝福';
-    } else if (timelinePhase === 'wordcloud') {
-        prevButton.textContent = '查看照片';
-        nextButton.textContent = '重新开始';
+    // 创建19根蜡烛
+    for (let i = 0; i < 19; i++) {
+        const candle = document.createElement('div');
+        candle.className = 'candle';
+        candle.addEventListener('click', function() {
+            blowOutCandle(this);
+        });
+        candlesContainer.appendChild(candle);
     }
 }
 
-// 处理上一个按钮点击
-function handlePrevButton() {
-    if (timelinePhase === 'timeline') {
-        transitionToPrevYear();
-    } else if (timelinePhase === 'photos') {
-        currentYear = 2022; // 设置回时间线的年份
-        transitionToPhase('timeline');
-    } else if (timelinePhase === 'wordcloud') {
-        transitionToPhase('photos');
+// 吹灭蜡烛
+let blownCandles = 0;
+function blowOutCandle(candle) {
+    if (!candle.classList.contains('blown')) {
+        candle.classList.add('blown');
+        blownCandles++;
+        
+        // 创建一些礼花
+        createConfetti(50);
+        
+        // 检查是否所有蜡烛都被吹灭
+        if (blownCandles === 19) {
+            // 全部吹灭，显示特殊效果
+            setTimeout(() => {
+                createConfetti(200);
+                document.querySelector('.cake-message').textContent = '生日愿望已送达，生日快乐！';
+                
+                // 如果有背景音乐，可以在这里播放生日歌
+                if (!bgMusic.paused) {
+                    // 切换到生日歌
+                    // bgMusic.src = 'path/to/birthday-song.mp3';
+                    // bgMusic.play();
+                }
+            }, 500);
+        }
     }
 }
 
-// 处理下一个按钮点击
-function handleNextButton() {
-    if (timelinePhase === 'timeline') {
-        if (currentYear < 2022) {
-            transitionToNextYear();
-        } else {
-            transitionToPhase('photos');
-        }
-    } else if (timelinePhase === 'photos') {
-        transitionToPhase('wordcloud');
-    } else if (timelinePhase === 'wordcloud') {
-        // 重置并重新开始
-        currentYear = 2006;
-        transitionToPhase('timeline');
+// 创建礼花
+function createConfetti(count) {
+    for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        
+        // 随机大小
+        const size = 5 + Math.random() * 10;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${size}px`;
+        
+        // 随机颜色
+        const hue = Math.floor(Math.random() * 360);
+        confetti.style.backgroundColor = `hsl(${hue}, 90%, 60%)`;
+        
+        // 随机位置
+        const left = Math.random() * 100;
+        confetti.style.left = `${left}%`;
+        confetti.style.top = '50%';
+        
+        // 随机角度和延迟
+        const angle = Math.random() * 360;
+        const distance = Math.random() * 100 + 50;
+        const delay = Math.random() * 0.5;
+        confetti.style.transform = `rotate(${angle}deg)`;
+        confetti.style.animationDelay = `${delay}s`;
+        
+        document.body.appendChild(confetti);
+        
+        // 动画结束后移除
+        setTimeout(() => {
+            confetti.remove();
+        }, 4000);
     }
 }
 
@@ -683,6 +643,173 @@ function closePhotoViewer() {
     setTimeout(() => {
         fullscreenImage.src = '';
     }, 300);
+}
+
+// 导航到指定部分
+function navigateToSection(section) {
+    // 隐藏当前部分
+    hideCurrentSection();
+    
+    // 显示新部分
+    currentSection = section;
+    showCurrentSection();
+    
+    // 更新导航按钮
+    updateNavigationButtons();
+}
+
+// 隐藏当前部分
+function hideCurrentSection() {
+    switch (currentSection) {
+        case 'welcome':
+            welcomeContainer.style.opacity = '0';
+            welcomeContainer.style.pointerEvents = 'none';
+            break;
+        case 'memories':
+            memoriesContainer.classList.remove('visible');
+            break;
+        case 'wishes':
+            wishesWall.classList.remove('visible');
+            break;
+        case 'photos':
+            photoWall.classList.remove('visible');
+            break;
+        case 'wordcloud':
+            wordCloud.classList.remove('visible');
+            break;
+        case 'cake':
+            birthdayCake.classList.remove('visible');
+            break;
+    }
+}
+
+// 显示当前部分
+function showCurrentSection() {
+    switch (currentSection) {
+        case 'welcome':
+            welcomeContainer.style.opacity = '1';
+            welcomeContainer.style.pointerEvents = 'all';
+            break;
+        case 'memories':
+            memoriesContainer.classList.add('visible');
+            break;
+        case 'wishes':
+            wishesWall.classList.add('visible');
+            break;
+        case 'photos':
+            photoWall.classList.add('visible');
+            break;
+        case 'wordcloud':
+            wordCloud.classList.add('visible');
+            break;
+        case 'cake':
+            birthdayCake.classList.add('visible');
+            break;
+    }
+}
+
+// 更新导航按钮文本
+function updateNavigationButtons() {
+    switch (currentSection) {
+        case 'memories':
+            prevButton.textContent = '返回欢迎页';
+            nextButton.textContent = '查看祝福墙';
+            break;
+        case 'wishes':
+            prevButton.textContent = '珍贵记忆';
+            nextButton.textContent = '照片墙';
+            break;
+        case 'photos':
+            prevButton.textContent = '祝福墙';
+            nextButton.textContent = '词云';
+            break;
+        case 'wordcloud':
+            prevButton.textContent = '照片墙';
+            nextButton.textContent = '生日蛋糕';
+            break;
+        case 'cake':
+            prevButton.textContent = '词云';
+            nextButton.textContent = '重新开始';
+            break;
+    }
+    
+    // 特殊情况：在记忆部分显示上一个/下一个记忆的按钮
+    if (currentSection === 'memories') {
+        if (memoryData.length > 1) {
+            if (currentMemoryIndex > 0) {
+                prevButton.textContent = '上一个记忆';
+            }
+            if (currentMemoryIndex < memoryData.length - 1) {
+                nextButton.textContent = '下一个记忆';
+            }
+        }
+    }
+}
+
+// 导航到前一部分
+function navigateToPrevSection() {
+    if (currentSection === 'memories') {
+        if (currentMemoryIndex > 0) {
+            // 导航到上一个记忆
+            showMemoryAtIndex(currentMemoryIndex - 1);
+            return;
+        } else {
+            // 返回欢迎页
+            navigateToSection('welcome');
+        }
+    } else if (currentSection === 'wishes') {
+        navigateToSection('memories');
+    } else if (currentSection === 'photos') {
+        navigateToSection('wishes');
+    } else if (currentSection === 'wordcloud') {
+        navigateToSection('photos');
+    } else if (currentSection === 'cake') {
+        navigateToSection('wordcloud');
+    }
+}
+
+// 导航到下一部分
+function navigateToNextSection() {
+    if (currentSection === 'memories') {
+        if (currentMemoryIndex < memoryData.length - 1) {
+            // 导航到下一个记忆
+            showMemoryAtIndex(currentMemoryIndex + 1);
+            return;
+        } else {
+            // 进入祝福墙
+            navigateToSection('wishes');
+        }
+    } else if (currentSection === 'wishes') {
+        navigateToSection('photos');
+    } else if (currentSection === 'photos') {
+        navigateToSection('wordcloud');
+    } else if (currentSection === 'wordcloud') {
+        navigateToSection('cake');
+    } else if (currentSection === 'cake') {
+        // 重新开始整个旅程
+        blownCandles = 0;
+        currentMemoryIndex = 0;
+        navigateToSection('welcome');
+        initializeBirthdayCake();
+    }
+}
+
+// 音乐控制
+function toggleMusic() {
+    if (bgMusic.paused) {
+        bgMusic.play()
+            .then(() => {
+                musicToggle.classList.add('playing');
+                musicToggle.classList.remove('muted');
+            })
+            .catch(error => {
+                console.error('播放音乐失败:', error);
+            });
+    } else {
+        bgMusic.pause();
+        musicToggle.classList.remove('playing');
+        musicToggle.classList.add('muted');
+    }
 }
 
 // 初始化欢迎动画

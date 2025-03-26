@@ -3,7 +3,7 @@
 // 状态变量
 let welcomePhase = 'opening';
 let visibleLines = 0;
-let currentSection = 'welcome'; // welcome, memories, wishes, photos, wordcloud, cake
+let currentSection = 'welcome'; // welcome, memories, wishes, wordcloud, cake
 
 // 开场白文字
 const openingLines = [
@@ -70,11 +70,8 @@ const nextButton = document.getElementById('next-button');
 // 导航容器
 const memoriesContainer = document.getElementById('memories-container');
 const wishesWall = document.getElementById('wishes-wall');
-const photoWall = document.getElementById('photo-wall');
 const wordCloud = document.getElementById('word-cloud');
 const birthdayCake = document.getElementById('birthday-cake');
-const photoViewer = document.getElementById('photo-viewer');
-const fullscreenImage = document.getElementById('fullscreen-image');
 
 // 音乐控制
 const musicToggle = document.getElementById('music-toggle');
@@ -110,7 +107,6 @@ function initializeWelcome() {
     // 初始化各个部分
     initializeMemories();
     initializeWishesWall();
-    generatePhotoWall();
     generateWordCloud();
     initializeBirthdayCake();
 }
@@ -362,40 +358,24 @@ function startJourney() {
 
 // ---- 新添加的部分 ----
 
-// 特殊记忆数据
 const memoryData = [
     { year: 2006, image: '/api/placeholder/300/200', description: '在2006年的春天，你降临到这个世界，给家人带来了无比的喜悦。' },
-    { year: 2011, image: '/api/placeholder/300/200', description: '小学时期的你充满好奇，对世界充满了探索的欲望。' },
-    { year: 2014, image: '/api/placeholder/300/200', description: '初中生活开始，你开始展现出自己的才华和独特个性。' },
-    { year: 2018, image: '/api/placeholder/300/200', description: '高中岁月，学习与友谊并重，你逐渐成长为一个有责任感的少年。' },
-    { year: 2023, image: '/api/placeholder/300/200', description: '大学录取通知书到来，你迎来人生的新篇章。' },
-    { year: 2024, image: '/api/placeholder/300/200', description: '18岁成人礼，你正式迈入成年的门槛，未来充满了可能性。' },
-    { year: 2025, image: '/api/placeholder/300/200', description: '19岁生日，愿你在大学的旅途中收获知识、友谊与成长。' }
+    { year: 2012, image: '/api/placeholder/300/200', description: '小学时期，Lv.7' },
+    { year: 2018, image: '/api/placeholder/300/200', description: '初中生活开始，你开始展现出自己的才华和独特个性。' },
+    { year: 2020, image: '/api/placeholder/300/200', description: '高中岁月，既有令你怀念的友情和爱情，也有记恨的人和事吧' },
+    { year: 2023, image: '/api/placeholder/300/200', description: '进入清复北交之一。' },
+    { year: 2024, image: '/api/placeholder/300/200', description: '18岁成人礼，或许是悲伤的回忆' },
+    { year: 2025, image: '/api/placeholder/300/200', description: '19岁生日，愿你在将来的旅途中收获知识、友谊与成长。' }
 ];
 
 // 祝福墙数据
 const wishesData = [
-    { name: '爸爸', avatar: '/api/placeholder/40/40', content: '19岁生日快乐！希望你能像莫扎特一样，在自己热爱的领域发光发热，成为最好的自己。', date: '2025-03-28' },
-    { name: '妈妈', avatar: '/api/placeholder/40/40', content: '宝贝生日快乐！从你出生那天起，你就是我们家的小太阳。希望你永远保持那份阳光和热情，健康成长！', date: '2025-03-28' },
-    { name: '奶奶', avatar: '/api/placeholder/40/40', content: '祝我的乖孙女生日快乐！奶奶虽然不懂你们年轻人的世界，但奶奶的爱和祝福永远陪伴着你。', date: '2025-03-28' },
-    { name: '张老师', avatar: '/api/placeholder/40/40', content: '生日快乐！作为你的老师，很高兴看到你在大学里的成长。希望你能继续保持对知识的渴望，勇敢追求自己的梦想！', date: '2025-03-28' },
-    { name: '李同学', avatar: '/api/placeholder/40/40', content: '生日快乐，我的好朋友！感谢你一直以来的陪伴与支持。大学生活因为有你而更加精彩！', date: '2025-03-28' },
-    { name: '王同学', avatar: '/api/placeholder/40/40', content: '祝你生日快乐！愿你的19岁充满欢笑和美好，在学业和生活中都能找到平衡，成为最棒的自己！', date: '2025-03-28' },
-    { name: '赵阿姨', avatar: '/api/placeholder/40/40', content: '生日快乐！还记得你小时候总爱来我家玩，转眼间你已经长大成人了。希望你的未来一片光明！', date: '2025-03-28' },
-    { name: '孙叔叔', avatar: '/api/placeholder/40/40', content: '19岁生日快乐！大学是人生中最美好的时光之一，希望你能珍惜这段时光，收获知识与友谊。', date: '2025-03-28' }
-];
+    { name: '爸爸', avatar: '/api/placeholder/40/40', content: '这是一句令尊的祝福', date: '2025-03-28' },
+    { name: '妈妈', avatar: '/api/placeholder/40/40', content: '这是一句令堂的祝福', date: '2025-03-28' },
+    { name: '哥哥', avatar: '/api/placeholder/40/40', content: '喵喵喵？占位符', date: '2025-03-28' },
+    { name: '物理老师', avatar: '/api/placeholder/40/40', content: '记不住是不是物理老师最关心你了，总之他会祝福你', date: '2025-03-28' },
+    { name: '鱼鱼', avatar: '/api/placeholder/40/40', content: '生日快乐，我的信徒！', date: '2025-03-28' },
 
-// 照片数据
-const photoData = [
-    { year: 2006, src: '/api/placeholder/200/150', caption: '2006 迎接新生命' },
-    { year: 2011, src: '/api/placeholder/200/150', caption: '2011 童年记忆' },
-    { year: 2014, src: '/api/placeholder/200/150', caption: '2014 青春起点' },
-    { year: 2018, src: '/api/placeholder/200/150', caption: '2018 少年成长' },
-    { year: 2020, src: '/api/placeholder/200/150', caption: '2020 疫情时期' },
-    { year: 2023, src: '/api/placeholder/200/150', caption: '2023 大学录取' },
-    { year: 2024, src: '/api/placeholder/200/150', caption: '2024 十八成人' },
-    { year: 2025, src: '/api/placeholder/200/150', caption: '2025 未来已来' },
-    { year: 2025, src: '/api/placeholder/200/150', caption: '2025 生日快乐' }
 ];
 
 // 词云数据
@@ -493,33 +473,6 @@ function initializeWishesWall() {
         `;
         
         wishesContainer.appendChild(wishCard);
-    });
-}
-
-// 生成照片墙
-function generatePhotoWall() {
-    photoWall.innerHTML = '';
-    photoData.forEach(photo => {
-        const card = document.createElement('div');
-        card.className = 'photo-card';
-        
-        const image = document.createElement('div');
-        image.className = 'photo-image';
-        image.style.backgroundImage = `url(${photo.src})`;
-        
-        const caption = document.createElement('div');
-        caption.className = 'photo-caption';
-        caption.textContent = photo.caption;
-        
-        card.appendChild(image);
-        card.appendChild(caption);
-        
-        // 添加点击事件
-        card.addEventListener('click', () => {
-            openPhotoViewer(photo.src);
-        });
-        
-        photoWall.appendChild(card);
     });
 }
 
@@ -631,20 +584,6 @@ function createConfetti(count) {
     }
 }
 
-// 打开照片查看器
-function openPhotoViewer(src) {
-    fullscreenImage.src = src;
-    photoViewer.classList.add('visible');
-}
-
-// 关闭照片查看器
-function closePhotoViewer() {
-    photoViewer.classList.remove('visible');
-    setTimeout(() => {
-        fullscreenImage.src = '';
-    }, 300);
-}
-
 // 导航到指定部分
 function navigateToSection(section) {
     // 隐藏当前部分
@@ -671,9 +610,6 @@ function hideCurrentSection() {
         case 'wishes':
             wishesWall.classList.remove('visible');
             break;
-        case 'photos':
-            photoWall.classList.remove('visible');
-            break;
         case 'wordcloud':
             wordCloud.classList.remove('visible');
             break;
@@ -696,9 +632,6 @@ function showCurrentSection() {
         case 'wishes':
             wishesWall.classList.add('visible');
             break;
-        case 'photos':
-            photoWall.classList.add('visible');
-            break;
         case 'wordcloud':
             wordCloud.classList.add('visible');
             break;
@@ -717,14 +650,10 @@ function updateNavigationButtons() {
             break;
         case 'wishes':
             prevButton.textContent = '珍贵记忆';
-            nextButton.textContent = '照片墙';
-            break;
-        case 'photos':
-            prevButton.textContent = '祝福墙';
             nextButton.textContent = '词云';
             break;
         case 'wordcloud':
-            prevButton.textContent = '照片墙';
+            prevButton.textContent = '祝福墙';
             nextButton.textContent = '生日蛋糕';
             break;
         case 'cake':
@@ -759,10 +688,8 @@ function navigateToPrevSection() {
         }
     } else if (currentSection === 'wishes') {
         navigateToSection('memories');
-    } else if (currentSection === 'photos') {
-        navigateToSection('wishes');
     } else if (currentSection === 'wordcloud') {
-        navigateToSection('photos');
+        navigateToSection('wishes');
     } else if (currentSection === 'cake') {
         navigateToSection('wordcloud');
     }
@@ -780,8 +707,6 @@ function navigateToNextSection() {
             navigateToSection('wishes');
         }
     } else if (currentSection === 'wishes') {
-        navigateToSection('photos');
-    } else if (currentSection === 'photos') {
         navigateToSection('wordcloud');
     } else if (currentSection === 'wordcloud') {
         navigateToSection('cake');

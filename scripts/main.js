@@ -372,9 +372,9 @@ const memoryData = [
 const wishesData = [
     { name: '爸爸', avatar: '/api/placeholder/40/40', content: '这是一句令尊的祝福', date: '2025-03-28' },
     { name: '妈妈', avatar: '/api/placeholder/40/40', content: '这是一句令堂的祝福', date: '2025-03-28' },
-    { name: '哥哥', avatar: '/api/placeholder/40/40', content: '喵喵喵？占位符', date: '2025-03-28' },
-    { name: '物理老师', avatar: '/api/placeholder/40/40', content: '记不住是不是物理老师最关心你了，总之他会祝福你', date: '2025-03-28' },
-    { name: '鱼鱼', avatar: '/api/placeholder/40/40', content: '生日快乐，我的信徒！', date: '2025-03-28' },
+    { name: '哥哥', avatar: '/api/placeholder/40/40', content: 'PS：祝福墙实在没法填，QAQ', date: '2025-03-28' },
+    { name: '物理老师', avatar: '/api/placeholder/40/40', content: '老师的祝福', date: '2025-03-28' },
+    { name: '鱼鱼', avatar: '/api/placeholder/40/40', content: '生日快乐，不🐟🐟！', date: '2025-03-28' },
 
 ];
 
